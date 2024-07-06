@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Scanner</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>QR Code Scanner</h1>
+    <input type="file" id="qr-input" accept="image/*">
+    <button onclick="scanQR()">Scan QR Code</button>
+    <div id="result"></div>
+
+    <script>
+        function scanQR() {
+            var input = document.getElementById('qr-input');
+            var file = input.files[0];
+            var formData = new FormData();
+            formData.append('qrcodeimage', file);
+
+            $.ajax({
+                url: '/scan_qr/',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    var resultDiv = document.getElementById('result');
+                    if (response.status === 'verified') {
+                        resultDiv.innerHTML = '<h2>Verified</h2>' +
+                            '<p>ID: ' + response.data.id + '</p>' +
+                            '<p>Name: ' + response.data.name + '</p>' +
+                            '<p>Age: ' + response.data.age + '</p>' +
+                            '<p>Sex: ' + response.data.sex + '</p>' +
+                            '<p>Caste: ' + response.data.caste + '</p>' +
+                            '<p>Address: ' + response.data.address + '</p>' +
+                            '<p>Marital Status: ' + response.data.marital_status + '</p>';
+                    } else {
+                        resultDiv.innerHTML = '<h2>Error</h2><p>' + response.message + '</p>';
+                    }
+                },
+                error: function() {
+                    document.getElementById('result').innerHTML = '<h2>Error</h2><p>An error occurred while processing the request.</p>';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
